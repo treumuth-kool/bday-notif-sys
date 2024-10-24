@@ -26,9 +26,18 @@ exports.login = async (req, res) => {
 };
 
 exports.verifyToken = (req, res) => {
-  // The token is already verified by the auth middleware
-  // If we reach this point, the token is valid
-  res.status(200).json({ message: 'Token is valid' });
+  const token = req.headers['authorization']?.split(' ')[1];
+  if (!token) {
+    return res.status(401).json({ message: 'No token provided' });
+  }
+
+  jwt.verify(token, 'your_jwt_secret', (err, decoded) => {
+    if (err) {
+      return res.status(401).json({ message: 'Invalid or expired token' });
+    }
+   
+    res.status(200).json({ message: 'Token is valid' });
+  });
 };
 
 exports.logout = (req, res) => {
